@@ -4,9 +4,13 @@ Enhanced Custom Waybar MPRIS module
 Outputs structured data for use with Waybar's group module
 """
 
+import argparse
+import hashlib
 import json
+import os
 import subprocess
 import sys
+import tempfile
 
 PLAYER_ICONS = {
     "default": "",
@@ -44,11 +48,11 @@ def get_player_info():
     player = run_playerctl(["metadata", "--format", "{{playerName}}"])
     if not player:
         return None
-    
+
     title = run_playerctl(["metadata", "--format", "{{title}}"]) or "Unknown"
     artist = run_playerctl(["metadata", "--format", "{{artist}}"]) or "Unknown"
     status = run_playerctl(["status"]) or "Stopped"
-    
+
     return {
         "player": player.lower(),
         "title": title,
@@ -62,12 +66,68 @@ def truncate_text(text, max_len):
         return text
     return text[:max_len - 1] + "…"
 
+
+def get_scroll_state_file(text):
+    """Get the path to the scroll state file for the given text"""
+    text_hash = hashlib.md5(text.encode()).hexdigest()[:8]
+    return os.path.join(tempfile.gettempdir(), f"waybar-mpris-scroll-{text_hash}")
+
+
+def get_scrolling_text(text, max_len, scroll_speed=1):
+    """
+    Get scrolling text with state persistence.
+    Returns a window of text that shifts on each call.
+    """
+    if len(text) <= max_len:
+        return text
+
+    # Add separator for continuous scrolling effect
+    padded_text = text + "   ·   "
+    total_len = len(padded_text)
+
+    state_file = get_scroll_state_file(text)
+
+    # Read current position
+    try:
+        with open(state_file, 'r') as f:
+            position = int(f.read().strip())
+    except (FileNotFoundError, ValueError):
+        position = 0
+
+    # Calculate the visible window
+    visible_text = ""
+    for i in range(max_len):
+        idx = (position + i) % total_len
+        visible_text += padded_text[idx]
+
+    # Update position for next call
+    new_position = (position + scroll_speed) % total_len
+    try:
+        with open(state_file, 'w') as f:
+            f.write(str(new_position))
+    except IOError:
+        pass
+
+    return visible_text
+
+
 def main():
-    # Check which component to display (prev, play, next, or info)
-    component = sys.argv[1] if len(sys.argv) > 1 else "info"
-    
+    parser = argparse.ArgumentParser(description="Enhanced Waybar MPRIS module")
+    parser.add_argument("component", nargs="?", default="info",
+                        choices=["prev", "play", "next", "info", "endash", "player-icon"],
+                        help="Component to display")
+    parser.add_argument("--scroll", action="store_true",
+                        help="Enable scrolling text for long titles (info component only)")
+    parser.add_argument("--max-length", type=int, default=25,
+                        help="Maximum text length before truncating/scrolling (default: 25)")
+    parser.add_argument("--scroll-speed", type=int, default=1,
+                        help="Number of characters to scroll per update (default: 1)")
+
+    args = parser.parse_args()
+    component = args.component
+
     info = get_player_info()
-    
+
     if not info and component == "info":
         output = {
             "text": "",
@@ -76,12 +136,12 @@ def main():
         }
         print(json.dumps(output))
         return
-    
+
     if not info:
         # Don't show buttons if no player active
         print(json.dumps({"text": "", "class": "custom-enhanced-mpris-hidden"}))
         return
-    
+
     if component == "endash":
         output = {
             "text": "-",
@@ -117,23 +177,27 @@ def main():
         }
     else:  # info
         player_icon = PLAYER_ICONS.get(info["player"], PLAYER_ICONS["default"])
-        title = truncate_text(info["title"], 25)
-        
+
+        if args.scroll:
+            title = get_scrolling_text(info["title"], args.max_length, args.scroll_speed)
+        else:
+            title = truncate_text(info["title"], args.max_length)
+
         # if info["status"] == "Paused":
         #     text = f"{player_icon} <i>{title}</i>"
         # else:
         #     text = f"{player_icon} {title}"
 
         text = f"{player_icon}  {title}"
-        
+
         tooltip = f"{player_icon} {info['player'].title()}: {info['artist']} - {info['title']}"
-        
+
         output = {
             "text": text,
             "tooltip": tooltip,
             "class": f"media-info {info['status'].lower()}"
         }
-    
+
     print(json.dumps(output))
 
 if __name__ == "__main__":
