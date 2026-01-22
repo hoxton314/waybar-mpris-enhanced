@@ -35,8 +35,9 @@ check_dependencies() {
         missing+=("python3")
     fi
 
-    if ! command -v jq &> /dev/null; then
-        missing+=("jq")
+    # Check for json5 Python module
+    if ! python3 -c "import json5" &> /dev/null; then
+        missing+=("python3-json5 (pip install json5)")
     fi
 
     if [[ ${#missing[@]} -gt 0 ]]; then
@@ -45,7 +46,7 @@ check_dependencies() {
         exit 1
     fi
 
-    echo -e "${GREEN}✓${NC} Dependencies check passed (python3, playerctl, jq)"
+    echo -e "${GREEN}✓${NC} Dependencies check passed (python3, playerctl, json5)"
 }
 
 # Ask yes/no question
@@ -197,31 +198,54 @@ add_to_modules_array() {
         return 1
     fi
 
-    # Use jq to check and modify the config
-    # First check if module already exists in any modules array
-    if jq -e --arg mod "$module_name" '
-        (.["modules-left"] // []) + (.["modules-center"] // []) + (.["modules-right"] // [])
-        | any(. == $mod)
-    ' "$WAYBAR_CONFIG" > /dev/null 2>&1; then
+    # Check if already present
+    if grep -q "group/enhanced-mpris" "$WAYBAR_CONFIG"; then
         echo -e "${GREEN}✓${NC} Module already present in waybar config"
         return 0
     fi
 
-    # Check if the target array exists
-    if ! jq -e --arg arr "$array_name" 'has($arr)' "$WAYBAR_CONFIG" > /dev/null 2>&1; then
-        echo -e "${RED}Error: $array_name not found in config${NC}"
-        return 1
+    # Warn about comments
+    if grep -q '//' "$WAYBAR_CONFIG"; then
+        echo -e "${YELLOW}Warning: Your config contains comments which will be removed.${NC}"
+        if ! ask_yes_no "Continue anyway?" "y"; then
+            echo -e "${YELLOW}Skipped.${NC} Add \"group/enhanced-mpris\" to your $array_name array manually."
+            return 0
+        fi
     fi
 
-    # Add module to the specified array
-    local tmp_file
-    tmp_file=$(mktemp)
-    if jq --arg arr "$array_name" --arg mod "$module_name" \
-        '.[$arr] += [$mod]' "$WAYBAR_CONFIG" > "$tmp_file"; then
-        mv "$tmp_file" "$WAYBAR_CONFIG"
+    # Use Python with json5 to modify the config
+    if python3 << PYTHON
+import json5
+import sys
+
+config_path = "$WAYBAR_CONFIG"
+array_name = "$array_name"
+module_name = "$module_name"
+
+try:
+    with open(config_path, 'r') as f:
+        config = json5.load(f)
+
+    if array_name not in config:
+        print(f"Error: {array_name} not found in config", file=sys.stderr)
+        sys.exit(1)
+
+    if module_name in config[array_name]:
+        sys.exit(0)  # Already present
+
+    config[array_name].append(module_name)
+
+    with open(config_path, 'w') as f:
+        json5.dump(config, f, indent=2, quote_keys=True, trailing_commas=False)
+
+    sys.exit(0)
+except Exception as e:
+    print(f"Error: {e}", file=sys.stderr)
+    sys.exit(1)
+PYTHON
+    then
         echo -e "${GREEN}✓${NC} Added module to $array_name"
     else
-        rm -f "$tmp_file"
         echo -e "${RED}Error: Failed to update config${NC}"
         return 1
     fi
