@@ -1,5 +1,10 @@
 # waybar-mpris-enhanced
 
+![Waybar](https://img.shields.io/badge/Waybar-custom-blue)
+![Python](https://img.shields.io/badge/Python-3.x-green)
+![License](https://img.shields.io/badge/License-MIT-yellow)
+![Nerd Font](https://img.shields.io/badge/Nerd%20Font-required-purple)
+
 **Enhanced MPRIS media module for Waybar**  
 Single-line media tray with player icon, title, and playback controls.
 
