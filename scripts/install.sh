@@ -35,13 +35,17 @@ check_dependencies() {
         missing+=("python3")
     fi
 
+    if ! command -v jq &> /dev/null; then
+        missing+=("jq")
+    fi
+
     if [[ ${#missing[@]} -gt 0 ]]; then
         echo -e "${RED}Error: Missing dependencies: ${missing[*]}${NC}"
         echo "Please install them before continuing."
         exit 1
     fi
 
-    echo -e "${GREEN}✓${NC} Dependencies check passed (python3, playerctl)"
+    echo -e "${GREEN}✓${NC} Dependencies check passed (python3, playerctl, jq)"
 }
 
 # Ask yes/no question
@@ -186,48 +190,41 @@ add_module_to_bar() {
 
 add_to_modules_array() {
     local array_name="$1"
-    local module_entry="\"group/enhanced-mpris\""
+    local module_name="group/enhanced-mpris"
 
     if [[ ! -f "$WAYBAR_CONFIG" ]]; then
         echo -e "${RED}Error: Waybar config not found${NC}"
         return 1
     fi
 
-    # Check if already present
-    if grep -q "group/enhanced-mpris" "$WAYBAR_CONFIG"; then
+    # Use jq to check and modify the config
+    # First check if module already exists in any modules array
+    if jq -e --arg mod "$module_name" '
+        (.["modules-left"] // []) + (.["modules-center"] // []) + (.["modules-right"] // [])
+        | any(. == $mod)
+    ' "$WAYBAR_CONFIG" > /dev/null 2>&1; then
         echo -e "${GREEN}✓${NC} Module already present in waybar config"
         return 0
     fi
 
-    # Check if the array exists
-    if ! grep -q "\"$array_name\"" "$WAYBAR_CONFIG"; then
+    # Check if the target array exists
+    if ! jq -e --arg arr "$array_name" 'has($arr)' "$WAYBAR_CONFIG" > /dev/null 2>&1; then
         echo -e "${RED}Error: $array_name not found in config${NC}"
         return 1
     fi
 
-    # Find the line number of the array's closing bracket and insert before it
-    # This appends to the end of the array
-    local array_start
-    array_start=$(grep -n "\"$array_name\"" "$WAYBAR_CONFIG" | head -1 | cut -d: -f1)
-
-    # Find the closing bracket of this array (first ] after the array start, with or without comma)
-    local closing_line
-    closing_line=$(tail -n +"$array_start" "$WAYBAR_CONFIG" | grep -n '^\s*\],\?' | head -1 | cut -d: -f1)
-    closing_line=$((array_start + closing_line - 1))
-
-    # Get the line before the closing bracket to check if we need to add a comma
-    local prev_line=$((closing_line - 1))
-    local prev_content
-    prev_content=$(sed -n "${prev_line}p" "$WAYBAR_CONFIG")
-
-    # If the previous line has content and doesn't end with a comma or opening bracket, add comma
-    if [[ -n "$prev_content" && ! "$prev_content" =~ ,[[:space:]]*$ && ! "$prev_content" =~ \[[[:space:]]*$ ]]; then
-        sed -i "${prev_line}s/$/,/" "$WAYBAR_CONFIG"
+    # Add module to the specified array
+    local tmp_file
+    tmp_file=$(mktemp)
+    if jq --arg arr "$array_name" --arg mod "$module_name" \
+        '.[$arr] += [$mod]' "$WAYBAR_CONFIG" > "$tmp_file"; then
+        mv "$tmp_file" "$WAYBAR_CONFIG"
+        echo -e "${GREEN}✓${NC} Added module to $array_name"
+    else
+        rm -f "$tmp_file"
+        echo -e "${RED}Error: Failed to update config${NC}"
+        return 1
     fi
-
-    # Insert before the closing bracket (no trailing comma on last element)
-    sed -i "${closing_line}i\\    $module_entry" "$WAYBAR_CONFIG"
-    echo -e "${GREEN}✓${NC} Added module to $array_name"
 }
 
 show_manual_instructions() {
