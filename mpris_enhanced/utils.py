@@ -1,10 +1,26 @@
 """Utility functions for MPRIS module."""
 
-__all__ = ["truncate_text", "get_scroll_state_file", "get_scrolling_text"]
+__all__ = [
+    "truncate_text",
+    "get_scroll_state_file",
+    "get_scrolling_text",
+    "escape_pango",
+]
 
 import hashlib
 import os
 import tempfile
+
+
+def escape_pango(text: str) -> str:
+    """Escape special characters for Pango markup."""
+    return (
+        text.replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace("'", "&apos;")
+        .replace('"', "&quot;")
+    )
 
 
 def truncate_text(text: str, max_len: int) -> str:

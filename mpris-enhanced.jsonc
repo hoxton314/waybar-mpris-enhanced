@@ -12,52 +12,40 @@
   "custom/enhanced-mpris-prev-btn": {
     "exec": "~/.config/waybar/modules/waybar-mpris-enhanced/mpris_enhanced.py prev",
     "return-type": "json",
-    "interval": 2,
-    "format": "{}",
-    "on-click": "playerctl previous",
-    "escape": true
+    "interval": 5,
+    "on-click": "playerctl previous"
   },
 
   "custom/enhanced-mpris-play-btn": {
     "exec": "~/.config/waybar/modules/waybar-mpris-enhanced/mpris_enhanced.py play",
     "return-type": "json",
     "interval": 1,
-    "format": "{}",
-    "on-click": "playerctl play-pause",
-    "escape": true
+    "on-click": "playerctl play-pause"
   },
 
   "custom/enhanced-mpris-info": {
     "exec": "~/.config/waybar/modules/waybar-mpris-enhanced/mpris_enhanced.py info --scroll --max-length 20",
     "return-type": "json",
     "interval": 1,
-    "format": "{}",
-    "max-length": 35,
-    "escape": true
+    "max-length": 35
   },
 
   "custom/enhanced-mpris-next-btn": {
     "exec": "~/.config/waybar/modules/waybar-mpris-enhanced/mpris_enhanced.py next",
     "return-type": "json",
-    "interval": 2,
-    "format": "{}",
-    "on-click": "playerctl next",
-    "escape": true
+    "interval": 5,
+    "on-click": "playerctl next"
   },
 
   "custom/enhanced-mpris-endash": {
     "exec": "~/.config/waybar/modules/waybar-mpris-enhanced/mpris_enhanced.py endash",
     "return-type": "json",
-    "interval": 2,
-    "format": "{}",
-    "escape": true
+    "interval": 10
   },
 
   "custom/enhanced-mpris-player-icon": {
     "exec": "~/.config/waybar/modules/waybar-mpris-enhanced/mpris_enhanced.py player-icon",
     "return-type": "json",
-    "interval": 2,
-    "format": "{}",
-    "escape": true
+    "interval": 3
   }
 }

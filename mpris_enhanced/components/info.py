@@ -2,7 +2,7 @@
 
 from ..constants import PLAYER_ICONS
 from ..playerctl import PlayerInfo
-from ..utils import get_scrolling_text, truncate_text
+from ..utils import escape_pango, get_scrolling_text, truncate_text
 from .base import Component, ComponentOutput
 
 
@@ -30,8 +30,14 @@ class InfoComponent(Component):
         else:
             title = truncate_text(info.title, self.args.max_length)
 
-        text = f"{player_icon}  {title}"
-        tooltip = f"{player_icon} {info.player.title()}: {info.artist} - {info.title}"
+        # Escape title, artist, and player name for Pango markup
+        escaped_title = escape_pango(title)
+        escaped_artist = escape_pango(info.artist)
+        escaped_player = escape_pango(info.player.title())
+        escaped_full_title = escape_pango(info.title)
+
+        text = f"{player_icon}  {escaped_title}"
+        tooltip = f"{player_icon} {escaped_player}: {escaped_artist} - {escaped_full_title}"
 
         return ComponentOutput(
             text=text,
