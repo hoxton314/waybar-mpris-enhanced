@@ -155,9 +155,59 @@ configure_waybar() {
     if ask_yes_no "Auto-add imports to waybar config.jsonc and style.css?" "y"; then
         add_waybar_include "$include_line"
         add_waybar_css_import "$css_import"
+        add_module_to_bar
     else
         show_manual_instructions "$include_line" "$css_import"
     fi
+}
+
+add_module_to_bar() {
+    echo
+    echo -e "${YELLOW}Module Placement${NC}"
+    echo "Where should \"group/enhanced-mpris\" be added?"
+    echo "1) modules-left"
+    echo "2) modules-center"
+    echo "3) modules-right"
+    echo "4) Skip (I'll add it manually)"
+    echo
+
+    local choice
+    while true; do
+        read -rp "Choose placement [1-4]: " choice
+        case "$choice" in
+            1) add_to_modules_array "modules-left"; break ;;
+            2) add_to_modules_array "modules-center"; break ;;
+            3) add_to_modules_array "modules-right"; break ;;
+            4) echo -e "${YELLOW}Skipped.${NC} Add \"group/enhanced-mpris\" to your modules array manually."; break ;;
+            *) echo "Please enter 1, 2, 3, or 4." ;;
+        esac
+    done
+}
+
+add_to_modules_array() {
+    local array_name="$1"
+    local module_entry="\"group/enhanced-mpris\""
+
+    if [[ ! -f "$WAYBAR_CONFIG" ]]; then
+        echo -e "${RED}Error: Waybar config not found${NC}"
+        return 1
+    fi
+
+    # Check if already present
+    if grep -q "group/enhanced-mpris" "$WAYBAR_CONFIG"; then
+        echo -e "${GREEN}✓${NC} Module already present in waybar config"
+        return 0
+    fi
+
+    # Check if the array exists
+    if ! grep -q "\"$array_name\"" "$WAYBAR_CONFIG"; then
+        echo -e "${RED}Error: $array_name not found in config${NC}"
+        return 1
+    fi
+
+    # Add to the beginning of the specified array
+    sed -i "s|\"$array_name\": \[|\"$array_name\": [$module_entry, |" "$WAYBAR_CONFIG"
+    echo -e "${GREEN}✓${NC} Added module to $array_name"
 }
 
 show_manual_instructions() {
@@ -212,10 +262,6 @@ add_waybar_include() {
         sed -i "s|^{|{\n  \"include\": [$include_line],|" "$WAYBAR_CONFIG"
         echo -e "${GREEN}✓${NC} Created include array and added module"
     fi
-
-    echo
-    echo -e "${YELLOW}Note:${NC} Don't forget to add ${GREEN}\"group/enhanced-mpris\"${NC} to your"
-    echo "modules-left, modules-center, or modules-right array if not already present."
 }
 
 add_waybar_css_import() {
