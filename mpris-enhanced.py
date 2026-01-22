@@ -9,7 +9,6 @@ import hashlib
 import json
 import os
 import subprocess
-import sys
 import tempfile
 
 PLAYER_ICONS = {
@@ -89,7 +88,7 @@ def get_scrolling_text(text, max_len, scroll_speed=1):
 
     # Read current position
     try:
-        with open(state_file, 'r') as f:
+        with open(state_file) as f:
             position = int(f.read().strip())
     except (FileNotFoundError, ValueError):
         position = 0
@@ -105,7 +104,7 @@ def get_scrolling_text(text, max_len, scroll_speed=1):
     try:
         with open(state_file, 'w') as f:
             f.write(str(new_position))
-    except IOError:
+    except OSError:
         pass
 
     return visible_text
