@@ -25,12 +25,6 @@
   border-radius: 6px;
 }
 
-/* Previous Button */
-#custom-enhanced-mpris-prev-btn {
-  border-left: 1px solid #313244;
-  /* border-right: 1px solid #313244; */
-}
-
 /* Play/Pause Button */
 #custom-enhanced-mpris-play-btn {
   font-size: 16px;
@@ -42,9 +36,18 @@
   color: #f9e2af;
 }
 
+/* Previous Button */
+#custom-enhanced-mpris-prev-btn {
+  border-left: 1px solid #313244;
+  font-size: 20px;
+  margin-top: -1px;
+}
+
 /* Next Button */
 #custom-enhanced-mpris-next-btn {
   border-right: 1px dashed #313244;
+  font-size: 20px;
+  margin-top: -1px;
 }
 
 /* Media Info Display */

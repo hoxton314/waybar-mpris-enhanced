@@ -1,0 +1,1 @@
+"""Enhanced Waybar MPRIS module."""
