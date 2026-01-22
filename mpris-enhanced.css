@@ -1,0 +1,69 @@
+/* Media Group Container */
+#group-enhanced-mpris {
+  background-color: #1e1e2e;
+  border-radius: 10px;
+  padding: 0 4px;
+  margin: 0 8px;
+}
+
+/* Individual Button Styling */
+#custom-enhanced-mpris-prev-btn,
+#custom-enhanced-mpris-play-btn,
+#custom-enhanced-mpris-next-btn {
+  padding: 0 10px;
+  min-width: 20px;
+  color: #89b4fa;
+  transition: all 0.2s ease;
+}
+
+/* Hover Effects for Buttons */
+#custom-enhanced-mpris-prev-btn:hover,
+#custom-enhanced-mpris-play-btn:hover,
+#custom-enhanced-mpris-next-btn:hover {
+  background-color: #313244;
+  color: #cdd6f4;
+  border-radius: 6px;
+}
+
+/* Previous Button */
+#custom-enhanced-mpris-prev-btn {
+  border-left: 1px solid #313244;
+  /* border-right: 1px solid #313244; */
+}
+
+/* Play/Pause Button */
+#custom-enhanced-mpris-play-btn {
+  font-size: 16px;
+  color: #a6e3a1;
+  /* border-right: 1px solid #313244; */
+}
+
+#custom-enhanced-mpris-play-btn.paused {
+  color: #f9e2af;
+}
+
+/* Next Button */
+#custom-enhanced-mpris-next-btn {
+  border-right: 1px dashed #313244;
+}
+
+/* Media Info Display */
+#custom-enhanced-mpris-info {
+  padding: 0 12px;
+  color: #cdd6f4;
+  font-weight: 500;
+  border-right: 1px solid #313244;
+}
+
+#custom-enhanced-mpris-info.paused {
+  color: #a6adc8;
+}
+
+/* Hide elements when no media is playing */
+.custom-enhanced-mpris-hidden {
+  opacity: 0;
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  border: none;
+}

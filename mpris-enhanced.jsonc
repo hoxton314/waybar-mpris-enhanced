@@ -1,0 +1,63 @@
+{
+  "group/enhanced-mpris": {
+    "orientation": "inherit",
+    "modules": [
+      "custom/enhanced-mpris-prev-btn",
+      "custom/enhanced-mpris-play-btn",
+      "custom/enhanced-mpris-next-btn",
+      "custom/enhanced-mpris-info"
+    ]
+  },
+
+  "custom/enhanced-mpris-prev-btn": {
+    "exec": "~/.config/waybar/modules/mpris-enhanced/mpris-enhanced.py prev",
+    "return-type": "json",
+    "interval": 2,
+    "format": "{}",
+    "on-click": "playerctl previous",
+    "escape": true
+  },
+
+  "custom/enhanced-mpris-play-btn": {
+    "exec": "~/.config/waybar/modules/mpris-enhanced/mpris-enhanced.py play",
+    "return-type": "json",
+    "interval": 1,
+    "format": "{}",
+    "on-click": "playerctl play-pause",
+    "escape": true
+  },
+
+  "custom/enhanced-mpris-info": {
+    "exec": "~/.config/waybar/modules/mpris-enhanced/mpris-enhanced.py info",
+    "return-type": "json",
+    "interval": 2,
+    "format": "{}",
+    "max-length": 35,
+    "escape": true
+  },
+
+  "custom/enhanced-mpris-next-btn": {
+    "exec": "~/.config/waybar/modules/mpris-enhanced/mpris-enhanced.py next",
+    "return-type": "json",
+    "interval": 2,
+    "format": "{}",
+    "on-click": "playerctl next",
+    "escape": true
+  },
+
+  "custom/enhanced-mpris-endash": {
+    "exec": "~/.config/waybar/modules/mpris-enhanced/mpris-enhanced.py endash",
+    "return-type": "json",
+    "interval": 2,
+    "format": "{}",
+    "escape": true
+  },
+
+  "custom/enhanced-mpris-player-icon": {
+    "exec": "~/.config/waybar/modules/mpris-enhanced/mpris-enhanced.py player-icon",
+    "return-type": "json",
+    "interval": 2,
+    "format": "{}",
+    "escape": true
+  }
+}
