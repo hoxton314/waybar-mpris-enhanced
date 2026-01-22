@@ -210,9 +210,9 @@ add_to_modules_array() {
     local array_start
     array_start=$(grep -n "\"$array_name\"" "$WAYBAR_CONFIG" | head -1 | cut -d: -f1)
 
-    # Find the closing bracket of this array (first ] after the array start)
+    # Find the closing bracket of this array (first ] after the array start, with or without comma)
     local closing_line
-    closing_line=$(tail -n +"$array_start" "$WAYBAR_CONFIG" | grep -n '^\s*\]' | head -1 | cut -d: -f1)
+    closing_line=$(tail -n +"$array_start" "$WAYBAR_CONFIG" | grep -n '^\s*\],\?' | head -1 | cut -d: -f1)
     closing_line=$((array_start + closing_line - 1))
 
     # Get the line before the closing bracket to check if we need to add a comma
