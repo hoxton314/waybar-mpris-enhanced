@@ -205,8 +205,18 @@ add_to_modules_array() {
         return 1
     fi
 
-    # Add to the beginning of the specified array
-    sed -i "s|\"$array_name\": \[|\"$array_name\": [$module_entry, |" "$WAYBAR_CONFIG"
+    # Find the line number of the array's closing bracket and insert before it
+    # This appends to the end of the array
+    local array_start
+    array_start=$(grep -n "\"$array_name\"" "$WAYBAR_CONFIG" | head -1 | cut -d: -f1)
+
+    # Find the closing bracket of this array (first ] after the array start)
+    local closing_line
+    closing_line=$(tail -n +"$array_start" "$WAYBAR_CONFIG" | grep -n '^\s*\]' | head -1 | cut -d: -f1)
+    closing_line=$((array_start + closing_line - 1))
+
+    # Insert before the closing bracket
+    sed -i "${closing_line}i\\    $module_entry," "$WAYBAR_CONFIG"
     echo -e "${GREEN}✓${NC} Added module to $array_name"
 }
 
