@@ -1,9 +1,11 @@
 # waybar-mpris-enhanced
 
-![Waybar](https://img.shields.io/badge/Waybar-custom-blue)
-![Python](https://img.shields.io/badge/Python-3.x-green)
-![License](https://img.shields.io/badge/License-MIT-yellow)
-![Nerd Font](https://img.shields.io/badge/Nerd%20Font-required-purple)
+[![Python Version](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
+[![Waybar](https://img.shields.io/badge/Waybar-custom%20module-6C8EBF)](https://github.com/Alexays/Waybar)
+[![Nerd Font Required](https://img.shields.io/badge/Nerd%20Font-required-purple)](https://www.nerdfonts.com/)
+[![GitHub stars](https://img.shields.io/github/stars/hoxton314/waybar-mpris-enhanced?style=social)](https://github.com/hoxton314/waybar-mpris-enhanced/stargazers)
 
 **Enhanced MPRIS media module for Waybar**  
 Single-line media tray with player icon, title, and playback controls.

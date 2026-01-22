@@ -1,4 +1,8 @@
-"""Info display components (info, player-icon, endash)."""
+"""Info display components (info, player-icon, endash).
+
+Components for displaying media information including player icons,
+track titles, and separator elements.
+"""
 
 from ..constants import PLAYER_ICONS
 from ..playerctl import PlayerInfo
@@ -7,7 +11,11 @@ from .base import Component, ComponentOutput
 
 
 class InfoComponent(Component):
-    """Main info component showing player icon and track title."""
+    """Main info component showing player icon and track title.
+    
+    Displays the current media player icon and track title with optional
+    scrolling for long titles. Includes tooltip with full information.
+    """
 
     name = "info"
 
@@ -47,7 +55,10 @@ class InfoComponent(Component):
 
 
 class PlayerIconComponent(Component):
-    """Player icon only component."""
+    """Player icon only component.
+    
+    Displays only the icon representing the current media player.
+    """
 
     name = "player-icon"
 
@@ -64,7 +75,11 @@ class PlayerIconComponent(Component):
 
 
 class EndashComponent(Component):
-    """Endash separator component."""
+    """Endash separator component.
+    
+    Displays a simple dash separator between other components.
+    Hidden when no player is active.
+    """
 
     name = "endash"
 

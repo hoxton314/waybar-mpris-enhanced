@@ -1,4 +1,8 @@
-"""Control button components (prev, play, next)."""
+"""Control button components (prev, play, next).
+
+Components for rendering media playback control buttons (previous,
+play/pause, next) with appropriate icons and states.
+"""
 
 from ..constants import CONTROL_ICONS
 from ..playerctl import PlayerInfo
@@ -6,7 +10,10 @@ from .base import Component, ComponentOutput
 
 
 class PrevComponent(Component):
-    """Previous track button component."""
+    """Previous track button component.
+    
+    Displays a button to skip to the previous track.
+    """
 
     name = "prev"
 
@@ -21,7 +28,11 @@ class PrevComponent(Component):
 
 
 class PlayComponent(Component):
-    """Play/pause button component."""
+    """Play/pause button component.
+    
+    Displays a play or pause icon based on current playback status.
+    Shows pause icon when playing, play icon when paused.
+    """
 
     name = "play"
 
@@ -43,7 +54,10 @@ class PlayComponent(Component):
 
 
 class NextComponent(Component):
-    """Next track button component."""
+    """Next track button component.
+    
+    Displays a button to skip to the next track.
+    """
 
     name = "next"
 

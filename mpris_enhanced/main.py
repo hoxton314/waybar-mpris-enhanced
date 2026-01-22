@@ -1,8 +1,13 @@
-"""Main entry point for MPRIS enhanced module."""
+"""Main entry point for MPRIS enhanced module.
+
+This module provides Waybar-compatible JSON output for displaying
+and controlling MPRIS media players.
+"""
 
 import argparse
 import json
 
+from . import __version__
 from .components import (
     EndashComponent,
     InfoComponent,
@@ -25,8 +30,21 @@ COMPONENTS = {
 
 
 def parse_args() -> argparse.Namespace:
-    """Parse command line arguments."""
-    parser = argparse.ArgumentParser(description="Enhanced Waybar MPRIS module")
+    """Parse command line arguments.
+    
+    Returns:
+        argparse.Namespace: Parsed command line arguments containing component
+            selection and display options.
+    """
+    parser = argparse.ArgumentParser(
+        description="Enhanced Waybar MPRIS module",
+        prog="waybar-mpris-enhanced",
+    )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"%(prog)s {__version__}",
+    )
     parser.add_argument(
         "component",
         nargs="?",
@@ -56,7 +74,13 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> None:
-    """Main entry point."""
+    """Main entry point for the MPRIS enhanced module.
+    
+    Parses command line arguments, retrieves current player information,
+    renders the requested component, and outputs JSON for Waybar consumption.
+    
+    The function exits with status 0 on success.
+    """
     args = parse_args()
 
     component_args = ComponentArgs(
