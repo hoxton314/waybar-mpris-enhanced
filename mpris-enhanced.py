@@ -19,15 +19,16 @@ PLAYER_ICONS = {
     "vlc": "󰕼",
     "mpv": "",
     "soundcloud": "",
-    "optional": ""
+    "optional": "",
 }
 
 STATUS_ICONS = {
     "paused": "",
     "playing": "",
     "stopped": "",
-    "default": ""
+    "default": "",
 }
+
 
 def run_playerctl(args):
     """Run playerctl command and return output"""
@@ -36,11 +37,12 @@ def run_playerctl(args):
             ["playerctl"] + args,
             capture_output=True,
             text=True,
-            timeout=2
+            timeout=2,
         )
         return result.stdout.strip() if result.returncode == 0 else None
     except (subprocess.TimeoutExpired, FileNotFoundError):
         return None
+
 
 def get_player_info():
     """Get current player information"""
@@ -56,20 +58,24 @@ def get_player_info():
         "player": player.lower(),
         "title": title,
         "artist": artist,
-        "status": status
+        "status": status,
     }
+
 
 def truncate_text(text, max_len):
     """Truncate text to max length with ellipsis"""
     if len(text) <= max_len:
         return text
-    return text[:max_len - 1] + "…"
+    return text[: max_len - 1] + "…"
 
 
 def get_scroll_state_file(text):
     """Get the path to the scroll state file for the given text"""
     text_hash = hashlib.md5(text.encode()).hexdigest()[:8]
-    return os.path.join(tempfile.gettempdir(), f"waybar-mpris-scroll-{text_hash}")
+    return os.path.join(
+        tempfile.gettempdir(),
+        f"waybar-mpris-scroll-{text_hash}",
+    )
 
 
 def get_scrolling_text(text, max_len, scroll_speed=1):
@@ -102,7 +108,7 @@ def get_scrolling_text(text, max_len, scroll_speed=1):
     # Update position for next call
     new_position = (position + scroll_speed) % total_len
     try:
-        with open(state_file, 'w') as f:
+        with open(state_file, "w") as f:
             f.write(str(new_position))
     except OSError:
         pass
@@ -112,15 +118,37 @@ def get_scrolling_text(text, max_len, scroll_speed=1):
 
 def main():
     parser = argparse.ArgumentParser(description="Enhanced Waybar MPRIS module")
-    parser.add_argument("component", nargs="?", default="info",
-                        choices=["prev", "play", "next", "info", "endash", "player-icon"],
-                        help="Component to display")
-    parser.add_argument("--scroll", action="store_true",
-                        help="Enable scrolling text for long titles (info component only)")
-    parser.add_argument("--max-length", type=int, default=25,
-                        help="Maximum text length before truncating/scrolling (default: 25)")
-    parser.add_argument("--scroll-speed", type=int, default=1,
-                        help="Number of characters to scroll per update (default: 1)")
+    parser.add_argument(
+        "component",
+        nargs="?",
+        default="info",
+        choices=[
+            "prev",
+            "play",
+            "next",
+            "info",
+            "endash",
+            "player-icon",
+        ],
+        help="Component to display",
+    )
+    parser.add_argument(
+        "--scroll",
+        action="store_true",
+        help="Enable scrolling text for long titles (info component only)",
+    )
+    parser.add_argument(
+        "--max-length",
+        type=int,
+        default=25,
+        help="Maximum text length before truncating/scrolling (default: 25)",
+    )
+    parser.add_argument(
+        "--scroll-speed",
+        type=int,
+        default=1,
+        help="Number of characters to scroll per update (default: 1)",
+    )
 
     args = parser.parse_args()
     component = args.component
@@ -131,33 +159,37 @@ def main():
         output = {
             "text": "",
             "tooltip": "No media playing",
-            "class": "stopped"
+            "class": "stopped",
         }
         print(json.dumps(output))
         return
 
     if not info:
         # Don't show buttons if no player active
-        print(json.dumps({"text": "", "class": "custom-enhanced-mpris-hidden"}))
+        print(
+            json.dumps(
+                {
+                    "text": "",
+                    "class": "custom-enhanced-mpris-hidden",
+                }
+            )
+        )
         return
 
     if component == "endash":
-        output = {
-            "text": "-",
-            "class": "endash"
-        }
+        output = {"text": "-", "class": "endash"}
     elif component == "player-icon":
         player_icon = PLAYER_ICONS.get(info["player"], PLAYER_ICONS["default"])
 
         output = {
             "text": f"{player_icon}",
-            "class": "media-info"
+            "class": "media-info",
         }
     elif component == "prev":
         output = {
             "text": "󰒮",
             # "tooltip": "Previous track",
-            "class": "media-button prev"
+            "class": "media-button prev",
         }
     elif component == "play":
         # Show Pause icon when playing, Play icon when paused
@@ -166,19 +198,23 @@ def main():
         output = {
             "text": status_icon,
             # "tooltip": tooltip,
-            "class": f"media-button play {info['status'].lower()}"
+            "class": f"media-button play {info['status'].lower()}",
         }
     elif component == "next":
         output = {
             "text": "󰒭",
             # "tooltip": "Next track",
-            "class": "media-button next"
+            "class": "media-button next",
         }
     else:  # info
         player_icon = PLAYER_ICONS.get(info["player"], PLAYER_ICONS["default"])
 
         if args.scroll:
-            title = get_scrolling_text(info["title"], args.max_length, args.scroll_speed)
+            title = get_scrolling_text(
+                info["title"],
+                args.max_length,
+                args.scroll_speed,
+            )
         else:
             title = truncate_text(info["title"], args.max_length)
 
@@ -194,10 +230,11 @@ def main():
         output = {
             "text": text,
             "tooltip": tooltip,
-            "class": f"media-info {info['status'].lower()}"
+            "class": f"media-info {info['status'].lower()}",
         }
 
     print(json.dumps(output))
+
 
 if __name__ == "__main__":
     main()
