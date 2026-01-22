@@ -14,6 +14,7 @@ REPO_DIR="$(dirname "$SCRIPT_DIR")"
 REPO_NAME="$(basename "$REPO_DIR")"
 WAYBAR_MODULES_DIR="$HOME/.config/waybar/modules"
 WAYBAR_CONFIG="$HOME/.config/waybar/config.jsonc"
+WAYBAR_STYLE="$HOME/.config/waybar/style.css"
 MODULE_NAME="$REPO_NAME"
 INSTALL_PATH="$WAYBAR_MODULES_DIR/$MODULE_NAME"
 
@@ -143,27 +144,41 @@ install_copy() {
     echo -e "${GREEN}✓${NC} Copied files to $INSTALL_PATH"
 }
 
-# Configure waybar
+# Configure waybar imports
 configure_waybar() {
+    local include_line="\"./modules/$MODULE_NAME/mpris-enhanced.jsonc\""
+    local css_import="@import './modules/$MODULE_NAME/mpris-enhanced.css';"
+
     echo
     echo -e "${YELLOW}Waybar Configuration${NC}"
 
-    local include_line="\"./modules/$MODULE_NAME/mpris-enhanced.jsonc\""
-
-    if ask_yes_no "Auto-add module import to waybar config.jsonc?" "y"; then
+    if ask_yes_no "Auto-add imports to waybar config.jsonc and style.css?" "y"; then
         add_waybar_include "$include_line"
+        add_waybar_css_import "$css_import"
     else
-        echo
-        echo -e "${YELLOW}Manual configuration required:${NC}"
-        echo
-        echo "1. Open $WAYBAR_CONFIG"
-        echo
-        echo "2. Add to your \"include\" array:"
-        echo -e "   ${GREEN}$include_line${NC}"
-        echo
-        echo "3. Add \"group/enhanced-mpris\" to your modules-left/center/right array"
-        echo
+        show_manual_instructions "$include_line" "$css_import"
     fi
+}
+
+show_manual_instructions() {
+    local include_line="$1"
+    local css_import="$2"
+
+    echo
+    echo -e "${YELLOW}Manual configuration required:${NC}"
+    echo
+    echo -e "${BLUE}1. config.jsonc${NC} ($WAYBAR_CONFIG)"
+    echo
+    echo "   Add to your \"include\" array (create one if it doesn't exist):"
+    echo -e "   ${GREEN}$include_line${NC}"
+    echo
+    echo "   Add \"group/enhanced-mpris\" to your modules-left/center/right array"
+    echo
+    echo -e "${BLUE}2. style.css${NC} ($WAYBAR_STYLE)"
+    echo
+    echo "   Add this import at the top of the file:"
+    echo -e "   ${GREEN}$css_import${NC}"
+    echo
 }
 
 add_waybar_include() {
@@ -171,7 +186,6 @@ add_waybar_include() {
 
     if [[ ! -f "$WAYBAR_CONFIG" ]]; then
         echo -e "${RED}Error: Waybar config not found at $WAYBAR_CONFIG${NC}"
-        echo "Please add the include manually."
         return 1
     fi
 
@@ -202,6 +216,34 @@ add_waybar_include() {
     echo
     echo -e "${YELLOW}Note:${NC} Don't forget to add ${GREEN}\"group/enhanced-mpris\"${NC} to your"
     echo "modules-left, modules-center, or modules-right array if not already present."
+}
+
+add_waybar_css_import() {
+    local css_import="$1"
+
+    if [[ ! -f "$WAYBAR_STYLE" ]]; then
+        echo -e "${RED}Error: Waybar style.css not found at $WAYBAR_STYLE${NC}"
+        return 1
+    fi
+
+    # Check if already imported
+    if grep -q "$MODULE_NAME/mpris-enhanced.css" "$WAYBAR_STYLE"; then
+        echo -e "${GREEN}✓${NC} CSS already imported in waybar style.css"
+        return 0
+    fi
+
+    # Add import at the top of the file (after any existing @imports)
+    if grep -q '^@import' "$WAYBAR_STYLE"; then
+        # Add after the last @import line
+        local last_import_line
+        last_import_line=$(grep -n '^@import' "$WAYBAR_STYLE" | tail -1 | cut -d: -f1)
+        sed -i "${last_import_line}a\\$css_import" "$WAYBAR_STYLE"
+    else
+        # No existing imports - add at the very top
+        sed -i "1i\\$css_import" "$WAYBAR_STYLE"
+    fi
+
+    echo -e "${GREEN}✓${NC} Added CSS import to waybar style.css"
 }
 
 # Main installation flow
