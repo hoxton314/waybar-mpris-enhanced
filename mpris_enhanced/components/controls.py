@@ -11,7 +11,7 @@ from .base import Component, ComponentOutput
 
 class PrevComponent(Component):
     """Previous track button component.
-    
+
     Displays a button to skip to the previous track.
     """
 
@@ -29,7 +29,7 @@ class PrevComponent(Component):
 
 class PlayComponent(Component):
     """Play/pause button component.
-    
+
     Displays a play or pause icon based on current playback status.
     Shows pause icon when playing, play icon when paused.
     """
@@ -55,7 +55,7 @@ class PlayComponent(Component):
 
 class NextComponent(Component):
     """Next track button component.
-    
+
     Displays a button to skip to the next track.
     """
 

@@ -12,7 +12,7 @@ from .base import Component, ComponentOutput
 
 class InfoComponent(Component):
     """Main info component showing player icon and track title.
-    
+
     Displays the current media player icon and track title with optional
     scrolling for long titles. Includes tooltip with full information.
     """
@@ -56,7 +56,7 @@ class InfoComponent(Component):
 
 class PlayerIconComponent(Component):
     """Player icon only component.
-    
+
     Displays only the icon representing the current media player.
     """
 
@@ -76,7 +76,7 @@ class PlayerIconComponent(Component):
 
 class EndashComponent(Component):
     """Endash separator component.
-    
+
     Displays a simple dash separator between other components.
     Hidden when no player is active.
     """

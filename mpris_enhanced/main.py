@@ -31,7 +31,7 @@ COMPONENTS = {
 
 def parse_args() -> argparse.Namespace:
     """Parse command line arguments.
-    
+
     Returns:
         argparse.Namespace: Parsed command line arguments containing component
             selection and display options.
@@ -75,10 +75,10 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     """Main entry point for the MPRIS enhanced module.
-    
+
     Parses command line arguments, retrieves current player information,
     renders the requested component, and outputs JSON for Waybar consumption.
-    
+
     The function exits with status 0 on success.
     """
     args = parse_args()

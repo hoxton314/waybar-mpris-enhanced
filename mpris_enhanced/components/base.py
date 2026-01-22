@@ -13,7 +13,7 @@ from ..playerctl import PlayerInfo
 @dataclass
 class ComponentOutput:
     """Output structure for waybar custom module.
-    
+
     Attributes:
         text: The text to display in the Waybar module.
         class_: CSS class name(s) for styling the module.
@@ -26,7 +26,7 @@ class ComponentOutput:
 
     def to_dict(self) -> dict[str, str]:
         """Convert to dictionary for JSON output.
-        
+
         Returns:
             Dictionary with 'text', 'class', and optionally 'tooltip' keys
             for Waybar custom module JSON format.
@@ -40,7 +40,7 @@ class ComponentOutput:
 @dataclass
 class ComponentArgs:
     """Arguments passed to components.
-    
+
     Attributes:
         scroll: Enable scrolling animation for long text.
         max_length: Maximum text length before truncation/scrolling.
@@ -54,14 +54,14 @@ class ComponentArgs:
 
 class Component(ABC):
     """Base class for all components.
-    
+
     All MPRIS components inherit from this class and must implement
     the render() method to provide Waybar-compatible output.
     """
 
     def __init__(self, args: ComponentArgs | None = None) -> None:
         """Initialize component with optional arguments.
-        
+
         Args:
             args: Component configuration arguments. Uses defaults if None.
         """
@@ -70,10 +70,10 @@ class Component(ABC):
     @abstractmethod
     def render(self, info: PlayerInfo | None) -> ComponentOutput:
         """Render the component output.
-        
+
         Args:
             info: Current player information, or None if no player active.
-        
+
         Returns:
             ComponentOutput with text, CSS class, and optional tooltip.
         """
@@ -81,7 +81,7 @@ class Component(ABC):
 
     def render_hidden(self) -> ComponentOutput:
         """Render hidden output when no player is active.
-        
+
         Returns:
             ComponentOutput with empty text and hidden CSS class.
         """

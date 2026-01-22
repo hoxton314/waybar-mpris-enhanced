@@ -13,7 +13,7 @@ from dataclasses import dataclass
 @dataclass
 class PlayerInfo:
     """Information about the current media player.
-    
+
     Attributes:
         player: Name of the media player (e.g., 'spotify', 'firefox').
         title: Title of the currently playing track.
@@ -29,14 +29,14 @@ class PlayerInfo:
 
 def run_playerctl(args: list[str]) -> str | None:
     """Run playerctl command and return output.
-    
+
     Args:
         args: List of command line arguments to pass to playerctl.
-    
+
     Returns:
         The stripped stdout from playerctl if successful, None if the command
         fails, times out, or playerctl is not found.
-    
+
     Example:
         >>> run_playerctl(['metadata', '--format', '{{title}}'])
         'Song Title'
@@ -55,14 +55,14 @@ def run_playerctl(args: list[str]) -> str | None:
 
 def get_player_info() -> PlayerInfo | None:
     """Get current player information from the active MPRIS player.
-    
+
     Queries playerctl for metadata about the currently active media player,
     including player name, track title, artist, and playback status.
-    
+
     Returns:
         PlayerInfo object containing current player state, or None if no
         player is active or playerctl is unavailable.
-    
+
     Example:
         >>> info = get_player_info()
         >>> if info:
