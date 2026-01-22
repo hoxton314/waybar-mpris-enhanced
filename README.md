@@ -27,7 +27,7 @@ Single-line media tray with player icon, title, and playback controls.
 
 ## 📸 Preview
 
-![Preview](screenshots/module-preview-1.png)
+![Preview](screenshots/module-preview-2.gif)
 
 ---
 
