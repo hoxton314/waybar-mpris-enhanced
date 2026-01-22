@@ -194,15 +194,9 @@ add_waybar_include() {
         fi
         echo -e "${GREEN}✓${NC} Added module to existing include array"
     else
-        # No include array - need to add one after the opening brace
-        # This is more complex, so we'll ask user to do it manually
-        echo -e "${YELLOW}No 'include' array found in waybar config.${NC}"
-        echo
-        echo "Please add manually at the top level of your config.jsonc:"
-        echo -e "  ${GREEN}\"include\": [$include_line],${NC}"
-        echo
-        echo "And add \"group/enhanced-mpris\" to your modules array."
-        return 1
+        # No include array - add one after the opening brace
+        sed -i "s|^{|{\n  \"include\": [$include_line],|" "$WAYBAR_CONFIG"
+        echo -e "${GREEN}✓${NC} Created include array and added module"
     fi
 
     echo
