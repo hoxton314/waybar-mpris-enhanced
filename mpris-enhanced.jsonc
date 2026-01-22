@@ -28,9 +28,9 @@
   },
 
   "custom/enhanced-mpris-info": {
-    "exec": "~/.config/waybar/modules/mpris-enhanced/mpris-enhanced.py info",
+    "exec": "~/.config/waybar/modules/mpris-enhanced/mpris-enhanced.py info --scroll --max-length 20",
     "return-type": "json",
-    "interval": 2,
+    "interval": 1,
     "format": "{}",
     "max-length": 35,
     "escape": true
