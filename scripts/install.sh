@@ -215,8 +215,18 @@ add_to_modules_array() {
     closing_line=$(tail -n +"$array_start" "$WAYBAR_CONFIG" | grep -n '^\s*\]' | head -1 | cut -d: -f1)
     closing_line=$((array_start + closing_line - 1))
 
-    # Insert before the closing bracket
-    sed -i "${closing_line}i\\    $module_entry," "$WAYBAR_CONFIG"
+    # Get the line before the closing bracket to check if we need to add a comma
+    local prev_line=$((closing_line - 1))
+    local prev_content
+    prev_content=$(sed -n "${prev_line}p" "$WAYBAR_CONFIG")
+
+    # If the previous line has content and doesn't end with a comma or opening bracket, add comma
+    if [[ -n "$prev_content" && ! "$prev_content" =~ ,[[:space:]]*$ && ! "$prev_content" =~ \[[[:space:]]*$ ]]; then
+        sed -i "${prev_line}s/$/,/" "$WAYBAR_CONFIG"
+    fi
+
+    # Insert before the closing bracket (no trailing comma on last element)
+    sed -i "${closing_line}i\\    $module_entry" "$WAYBAR_CONFIG"
     echo -e "${GREEN}✓${NC} Added module to $array_name"
 }
 
