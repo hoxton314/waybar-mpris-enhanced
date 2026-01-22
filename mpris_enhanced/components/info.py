@@ -36,7 +36,7 @@ class InfoComponent(Component):
         return ComponentOutput(
             text=text,
             tooltip=tooltip,
-            class_=f"media-info {info.status.lower()}",
+            class_=f"media-info {info.status}",
         )
 
 

@@ -1,5 +1,7 @@
 """Playerctl interaction for MPRIS module."""
 
+__all__ = ["PlayerInfo", "run_playerctl", "get_player_info"]
+
 import subprocess
 from dataclasses import dataclass
 
@@ -42,5 +44,5 @@ def get_player_info() -> PlayerInfo | None:
         player=player.lower(),
         title=title,
         artist=artist,
-        status=status,
+        status=status.lower(),
     )

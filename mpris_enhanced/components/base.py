@@ -1,7 +1,7 @@
 """Base component class for MPRIS module."""
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from ..playerctl import PlayerInfo
 
@@ -14,7 +14,7 @@ class ComponentOutput:
     class_: str
     tooltip: str | None = None
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, str]:
         """Convert to dictionary for JSON output."""
         result = {"text": self.text, "class": self.class_}
         if self.tooltip is not None:
@@ -34,15 +34,13 @@ class ComponentArgs:
 class Component(ABC):
     """Base class for all components."""
 
-    name: str = ""
-
     def __init__(self, args: ComponentArgs | None = None):
         self.args = args or ComponentArgs()
 
     @abstractmethod
     def render(self, info: PlayerInfo | None) -> ComponentOutput:
         """Render the component output."""
-        pass
+        ...
 
     def render_hidden(self) -> ComponentOutput:
         """Render hidden output when no player is active."""

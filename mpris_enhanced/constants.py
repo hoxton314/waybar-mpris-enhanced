@@ -1,5 +1,7 @@
 """Icon constants for MPRIS module."""
 
+__all__ = ["PLAYER_ICONS", "STATUS_ICONS", "CONTROL_ICONS"]
+
 PLAYER_ICONS = {
     "default": "",
     "spotify": "",

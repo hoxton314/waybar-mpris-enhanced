@@ -30,11 +30,15 @@ class PlayComponent(Component):
             return self.render_hidden()
 
         # Show Pause icon when playing, Play icon when paused
-        status_icon = CONTROL_ICONS["pause"] if info.status == "Playing" else CONTROL_ICONS["play"]
+        status_icon = (
+            CONTROL_ICONS["pause"]
+            if info.status == "playing"
+            else CONTROL_ICONS["play"]
+        )
 
         return ComponentOutput(
             text=status_icon,
-            class_=f"media-button play {info.status.lower()}",
+            class_=f"media-button play {info.status}",
         )
 
 
