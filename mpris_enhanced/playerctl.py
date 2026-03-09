@@ -55,12 +55,21 @@ def run_playerctl(args: list[str]) -> str | None:
 
 _STATUS_PRIORITY = {"playing": 0, "paused": 1, "stopped": 2}
 
+# Browsers that embed media players — deprioritized vs dedicated music apps.
+_BROWSER_PLAYERS = {"firefox", "chromium", "chrome", "google-chrome", "brave", "opera", "vivaldi", "epiphany"}
+
+
+def _player_type_priority(player_name: str) -> int:
+    """Return 0 for dedicated music apps, 1 for browsers."""
+    return 1 if player_name.lower().split(".")[0] in _BROWSER_PLAYERS else 0
+
 
 def select_best_player() -> str | None:
-    """Select the best player based on playback status.
+    """Select the best player based on playback status and player type.
 
-    Enumerates all available MPRIS players and selects the one with the
-    highest priority status: playing > paused > stopped.
+    Enumerates all available MPRIS players and selects using:
+      1. Playback status: playing > paused > stopped
+      2. Player type: dedicated music app > browser
 
     Returns:
         The name of the best player, or None if no players are available.
@@ -73,19 +82,20 @@ def select_best_player() -> str | None:
     if not players:
         return None
 
-    best_player = None
-    best_priority = len(_STATUS_PRIORITY)
-
+    candidates = []
     for player in players:
         status = run_playerctl(["--player", player, "status"])
         if status is None:
             continue
-        priority = _STATUS_PRIORITY.get(status.lower(), len(_STATUS_PRIORITY))
-        if priority < best_priority:
-            best_priority = priority
-            best_player = player
+        status_p = _STATUS_PRIORITY.get(status.lower(), len(_STATUS_PRIORITY))
+        type_p = _player_type_priority(player)
+        candidates.append((status_p, type_p, player))
 
-    return best_player
+    if not candidates:
+        return None
+
+    candidates.sort(key=lambda x: (x[0], x[1]))
+    return candidates[0][2]
 
 
 def get_player_info() -> PlayerInfo | None:
