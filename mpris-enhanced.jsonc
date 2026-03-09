@@ -27,7 +27,8 @@
     "exec": "~/.config/waybar/modules/waybar-mpris-enhanced/mpris_enhanced.py info --scroll --max-length 20",
     "return-type": "json",
     "interval": 1,
-    "max-length": 35
+    "max-length": 35,
+    "on-click": "~/.config/waybar/modules/waybar-mpris-enhanced/mpris_enhanced.py pick"
   },
 
   "custom/enhanced-mpris-next-btn": {

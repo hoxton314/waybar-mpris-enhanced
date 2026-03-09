@@ -4,10 +4,13 @@ This module handles all communication with playerctl to retrieve
 information about active MPRIS media players.
 """
 
-__all__ = ["PlayerInfo", "run_playerctl", "select_best_player", "get_player_info"]
+__all__ = ["PlayerInfo", "run_playerctl", "select_best_player", "get_player_info", "get_all_players", "pin_player", "get_pinned_player"]
 
+import os
 import subprocess
 from dataclasses import dataclass
+
+_PIN_FILE = os.path.join(os.environ.get("XDG_CACHE_HOME", os.path.expanduser("~/.cache")), "waybar-mpris-pinned")
 
 
 @dataclass
@@ -64,6 +67,43 @@ def _player_type_priority(player_name: str) -> int:
     return 1 if player_name.lower().split(".")[0] in _BROWSER_PLAYERS else 0
 
 
+def pin_player(player: str | None) -> None:
+    """Persist a manually selected player to the pin state file."""
+    try:
+        if player is None:
+            os.remove(_PIN_FILE)
+        else:
+            with open(_PIN_FILE, "w") as f:
+                f.write(player)
+    except OSError:
+        pass
+
+
+def get_pinned_player() -> str | None:
+    """Return the pinned player name if the file exists, else None."""
+    try:
+        with open(_PIN_FILE) as f:
+            return f.read().strip() or None
+    except FileNotFoundError:
+        return None
+
+
+def get_all_players() -> list[tuple[str, str]]:
+    """Return list of (player_name, status) for all active players."""
+    players_output = run_playerctl(["-l"])
+    if not players_output:
+        return []
+
+    result = []
+    for player in [p.strip() for p in players_output.splitlines() if p.strip()]:
+        status = run_playerctl(["--player", player, "status"])
+        if status is not None:
+            result.append((player, status.lower()))
+
+    result.sort(key=lambda x: (_STATUS_PRIORITY.get(x[1], 99), _player_type_priority(x[0])))
+    return result
+
+
 def select_best_player() -> str | None:
     """Select the best player based on playback status and player type.
 
@@ -95,6 +135,14 @@ def select_best_player() -> str | None:
         return None
 
     candidates.sort(key=lambda x: (x[0], x[1]))
+    active_players = {c[2] for c in candidates}
+
+    pinned = get_pinned_player()
+    if pinned and pinned in active_players:
+        return pinned
+    elif pinned:
+        pin_player(None)  # stale pin — clear it
+
     return candidates[0][2]
 
 
