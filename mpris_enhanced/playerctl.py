@@ -4,7 +4,7 @@ This module handles all communication with playerctl to retrieve
 information about active MPRIS media players.
 """
 
-__all__ = ["PlayerInfo", "run_playerctl", "get_player_info"]
+__all__ = ["PlayerInfo", "run_playerctl", "select_best_player", "get_player_info"]
 
 import subprocess
 from dataclasses import dataclass
@@ -53,11 +53,46 @@ def run_playerctl(args: list[str]) -> str | None:
         return None
 
 
+_STATUS_PRIORITY = {"playing": 0, "paused": 1, "stopped": 2}
+
+
+def select_best_player() -> str | None:
+    """Select the best player based on playback status.
+
+    Enumerates all available MPRIS players and selects the one with the
+    highest priority status: playing > paused > stopped.
+
+    Returns:
+        The name of the best player, or None if no players are available.
+    """
+    players_output = run_playerctl(["-l"])
+    if not players_output:
+        return None
+
+    players = [p.strip() for p in players_output.splitlines() if p.strip()]
+    if not players:
+        return None
+
+    best_player = None
+    best_priority = len(_STATUS_PRIORITY)
+
+    for player in players:
+        status = run_playerctl(["--player", player, "status"])
+        if status is None:
+            continue
+        priority = _STATUS_PRIORITY.get(status.lower(), len(_STATUS_PRIORITY))
+        if priority < best_priority:
+            best_priority = priority
+            best_player = player
+
+    return best_player
+
+
 def get_player_info() -> PlayerInfo | None:
     """Get current player information from the active MPRIS player.
 
-    Queries playerctl for metadata about the currently active media player,
-    including player name, track title, artist, and playback status.
+    Selects the best available player (playing > paused > stopped) and
+    queries playerctl for its metadata including title, artist, and status.
 
     Returns:
         PlayerInfo object containing current player state, or None if no
@@ -69,13 +104,13 @@ def get_player_info() -> PlayerInfo | None:
         ...     print(f"{info.artist} - {info.title}")
         Artist Name - Song Title
     """
-    player = run_playerctl(["metadata", "--format", "{{playerName}}"])
+    player = select_best_player()
     if not player:
         return None
 
-    title = run_playerctl(["metadata", "--format", "{{title}}"]) or "Unknown"
-    artist = run_playerctl(["metadata", "--format", "{{artist}}"]) or "Unknown"
-    status = run_playerctl(["status"]) or "Stopped"
+    title = run_playerctl(["--player", player, "metadata", "--format", "{{title}}"]) or "Unknown"
+    artist = run_playerctl(["--player", player, "metadata", "--format", "{{artist}}"]) or "Unknown"
+    status = run_playerctl(["--player", player, "status"]) or "Stopped"
 
     return PlayerInfo(
         player=player.lower(),

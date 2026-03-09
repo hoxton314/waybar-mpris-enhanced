@@ -13,14 +13,14 @@
     "exec": "~/.config/waybar/modules/waybar-mpris-enhanced/mpris_enhanced.py prev",
     "return-type": "json",
     "interval": 5,
-    "on-click": "playerctl previous"
+    "on-click": "bash -c 'playerctl --player=$(~/.config/waybar/modules/waybar-mpris-enhanced/mpris_enhanced.py select-player) previous'"
   },
 
   "custom/enhanced-mpris-play-btn": {
     "exec": "~/.config/waybar/modules/waybar-mpris-enhanced/mpris_enhanced.py play",
     "return-type": "json",
     "interval": 1,
-    "on-click": "playerctl play-pause"
+    "on-click": "bash -c 'playerctl --player=$(~/.config/waybar/modules/waybar-mpris-enhanced/mpris_enhanced.py select-player) play-pause'"
   },
 
   "custom/enhanced-mpris-info": {
@@ -34,7 +34,7 @@
     "exec": "~/.config/waybar/modules/waybar-mpris-enhanced/mpris_enhanced.py next",
     "return-type": "json",
     "interval": 5,
-    "on-click": "playerctl next"
+    "on-click": "bash -c 'playerctl --player=$(~/.config/waybar/modules/waybar-mpris-enhanced/mpris_enhanced.py select-player) next'"
   },
 
   "custom/enhanced-mpris-endash": {

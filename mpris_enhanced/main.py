@@ -17,7 +17,7 @@ from .components import (
     PrevComponent,
 )
 from .components.base import ComponentArgs
-from .playerctl import get_player_info
+from .playerctl import get_player_info, select_best_player
 
 COMPONENTS = {
     "info": InfoComponent,
@@ -49,8 +49,8 @@ def parse_args() -> argparse.Namespace:
         "component",
         nargs="?",
         default="info",
-        choices=list(COMPONENTS.keys()),
-        help="Component to display",
+        choices=list(COMPONENTS.keys()) + ["select-player"],
+        help="Component to display, or 'select-player' to print the best player name",
     )
     parser.add_argument(
         "--scroll",
@@ -88,6 +88,11 @@ def main() -> None:
         max_length=args.max_length,
         scroll_speed=args.scroll_speed,
     )
+
+    if args.component == "select-player":
+        player = select_best_player()
+        print(player or "")
+        return
 
     component_class = COMPONENTS[args.component]
     component = component_class(component_args)
